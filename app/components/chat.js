@@ -27,7 +27,7 @@ if (!window.location) {
 
 
 export default class MessageList extends Component {
-  state = {messages: [], newMessage:'', btnLocation: 0, refresh: true};
+  state = {messages: [], newMessage:'', btnLocation: 0};
   constructor(props) {
     super(props);
     this.clearText = this.clearText.bind(this);
@@ -55,17 +55,26 @@ export default class MessageList extends Component {
         }); 
 
         // listen for received messages
-        socket.on('msgReceived', (received) =>{
-          console.log("got it!")
-          console.log(received)
-          socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
-          socket.on('historyMsgReceived', (data) =>{
-            let message = data;
-            console.log("Fetched Data")
-            this.setState({messages: message});
-          });
-        });
+            // socket.on('msgReceived', (received) =>{
+            //   console.log("got it!")
+            //   console.log(received)
+            //   socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
+            //   socket.on('historyMsgReceived', (data) =>{
+            //     let message = data;
+            //     console.log("Fetched Data")
+            //     this.setState({messages: message});
+            //   });
+            // });
     });  
+  }
+
+  fetchHistory() {
+    socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
+    socket.on('historyMsgReceived', (data) =>{
+      let message = data;
+      console.log("Fetched Data")
+      this.setState({messages: message});
+    }); 
   }
 
   keyboardWillShow(e) {
@@ -104,7 +113,7 @@ export default class MessageList extends Component {
 
         <View style={styles.sendbox} >
         <TextInput 
-              multiline={true}
+              // multiline={true}
               ref={'textInput'}
               style={styles.input}
               onChangeText={text => this.setState({newMessage: text})}
@@ -126,8 +135,8 @@ export default class MessageList extends Component {
                 console.log('done?')
                 console.log(options)
               }
-              this.loadData()
               this.clearText('textInput')
+              this.fetchHistory()
           }}
           underlayColor='#D97573'>
           <Text style={styles.buttonText}>Send</Text>
