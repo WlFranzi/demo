@@ -10,6 +10,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Keyboard,
+  AppState,
 } from 'react-native';
 
 import ioSocket from '../config/ioSocket.js'
@@ -53,18 +54,6 @@ export default class MessageList extends Component {
           console.log("Fetched Data")
           this.setState({messages: message});
         }); 
-
-        // listen for received messages
-            // socket.on('msgReceived', (received) =>{
-            //   console.log("got it!")
-            //   console.log(received)
-            //   socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
-            //   socket.on('historyMsgReceived', (data) =>{
-            //     let message = data;
-            //     console.log("Fetched Data")
-            //     this.setState({messages: message});
-            //   });
-            // });
     });  
   }
 
@@ -75,6 +64,19 @@ export default class MessageList extends Component {
       console.log("Fetched Data")
       this.setState({messages: message});
     }); 
+  }
+
+  componentDidMount() {
+    AppState.addEventListener('change', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange(currentAppState) {
+      //    listen for received messages
+      socket.on('msgReceived', (received) =>{
+        console.log("got it!")
+        console.log(received)
+        this.setState({messages: this.state.messages.push(received)});
+      });
   }
 
   keyboardWillShow(e) {
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
   },
   sendbox: {
     flexDirection: 'row',
+    alignItems: 'center'
   },
   inputBox: {
     flex: 1,
@@ -194,24 +197,29 @@ const styles = StyleSheet.create({
   },
   buttonActive: {
     flex: .4,
-    backgroundColor: "#D6EFEF",
+    backgroundColor: "black",
     borderRadius: 6,
-    justifyContent: 'center',
-    margin: 5,
-    borderWidth: 2,
+    height: 6,
+    width: 6,
+    margin: 3,
+    borderColor: 'black',
+    borderRadius: 4,
   },
   buttonInactive: {
     flex: .4,
-    backgroundColor: "#D6EFEF",
+    backgroundColor: "black",
     borderRadius: 6,
-    justifyContent: 'center',
-    margin: 5,
-    borderWidth: 2,
-    borderColor: 'grey'
+    height: 6,
+    width: 6,
+    margin: 3,
+    borderWidth: 20,
+    borderColor: 'black',
+    borderRadius: 4,
   },
    buttonText: {
     height: 25,
     textAlign: 'center',
     fontSize: 18,
+    color: "white",
   },
 });
