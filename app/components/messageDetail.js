@@ -5,7 +5,7 @@ import { View, StyleSheet, Text } from 'react-native';
 const MessageDetail = (props) => {
   var id = props.message.senderId
   console.log(id)
-  if (id != 2) { 
+  if (id != 1) { 
     return (
       <View style={styles.talkBubble}>
         <View style={styles.talkBubbleOTHER}>

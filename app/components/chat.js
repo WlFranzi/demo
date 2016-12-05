@@ -13,8 +13,6 @@ import {
   AppState,
 } from 'react-native';
 
-import ioSocket from '../config/ioSocket.js'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import InvertibleScrollView from 'react-native-invertible-scroll-view';
 
 
@@ -28,7 +26,7 @@ if (!window.location) {
 
 
 export default class MessageList extends Component {
-  state = {messages: [], newMessage:'', btnLocation: 0};
+  state = {appState: AppState.currentState, messages: [], newMessage:'', btnLocation: 0};
   constructor(props) {
     super(props);
     this.clearText = this.clearText.bind(this);
@@ -42,13 +40,13 @@ export default class MessageList extends Component {
   loadData() {
     socket.on('connect', () => {
         console.log('connected!');
-        socket.emit('joinChatGroup', { userId: 2, groupId: 1 });
+        socket.emit('joinChatGroup', { userId: 1, groupId: 1 });
         socket.on('joined', (check) =>{
           console.log('Joined the chat room')
         });
         
         // fetch history of Messages
-        socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
+        socket.emit('fetchHistoryMsg', { groupId: 1, userId: 1 });
         socket.on('historyMsgReceived', (data) =>{
           let message = data;
           console.log("Fetched Data")
@@ -58,7 +56,7 @@ export default class MessageList extends Component {
   }
 
   fetchHistory() {
-    socket.emit('fetchHistoryMsg', { groupId: 1, userId: 2 });
+    socket.emit('fetchHistoryMsg', { groupId: 1, userId: 1 });
     socket.on('historyMsgReceived', (data) =>{
       let message = data;
       console.log("Fetched Data")
@@ -68,6 +66,12 @@ export default class MessageList extends Component {
 
   componentDidMount() {
     AppState.addEventListener('change', this._handleAppStateChange);
+    AppState.addEventListener('memoryWarning', this._handleMemoryWarning);
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+    AppState.removeEventListener('memoryWarning', this._handleMemoryWarning);
   }
 
   _handleAppStateChange(currentAppState) {
@@ -126,8 +130,8 @@ export default class MessageList extends Component {
           onPress={() => {
               if (this.state.newMessage != '') {
                 let options = {
-                  userId: 2,
-                  userName: 'Clara',
+                  userId: 1,
+                  userName: 'Gertrude',
                   groupId: 1,
                   groupName: 'stress',
                   content: this.state.newMessage,
@@ -168,7 +172,6 @@ const styles = StyleSheet.create({
   },
   sendbox: {
     flexDirection: 'row',
-    alignItems: 'center'
   },
   inputBox: {
     flex: 1,
@@ -197,29 +200,24 @@ const styles = StyleSheet.create({
   },
   buttonActive: {
     flex: .4,
-    backgroundColor: "black",
+    backgroundColor: "#D6EFEF",
     borderRadius: 6,
-    height: 6,
-    width: 6,
-    margin: 3,
-    borderColor: 'black',
-    borderRadius: 4,
+    justifyContent: 'center',
+    margin: 5,
+    borderWidth: 2
   },
   buttonInactive: {
     flex: .4,
-    backgroundColor: "black",
+    backgroundColor: "#e8f6f6",
     borderRadius: 6,
-    height: 6,
-    width: 6,
-    margin: 3,
-    borderWidth: 20,
-    borderColor: 'black',
-    borderRadius: 4,
+    justifyContent: 'center',
+    margin: 5,
+    borderWidth: 2,
+    borderColor: 'grey'
   },
    buttonText: {
     height: 25,
     textAlign: 'center',
     fontSize: 18,
-    color: "white",
   },
 });
