@@ -36,7 +36,9 @@ export default class MessageList extends Component {
   componentWillMount() {
     Keyboard.addListener('keyboardWillShow', (e) => this.keyboardWillShow(e));
     Keyboard.addListener('keyboardWillHide', (e) => this.keyboardWillHide(e));
+  }
 
+  loadData() {
     socket.on('connect', () => {
         console.log('connected!');
         socket.emit('joinChatGroup', { userId: 2, groupId: 1 });
@@ -49,7 +51,7 @@ export default class MessageList extends Component {
         socket.on('historyMsgReceived', (data) =>{
           let message = data;
           console.log("Fetched Data")
-          this.setState({messages: message, refresh:false});
+          this.setState({messages: message});
         }); 
 
         // listen for received messages
@@ -60,7 +62,7 @@ export default class MessageList extends Component {
           socket.on('historyMsgReceived', (data) =>{
             let message = data;
             console.log("Fetched Data")
-            this.setState({messages: message, refresh:false});
+            this.setState({messages: message});
           });
         });
     });  
@@ -85,6 +87,7 @@ export default class MessageList extends Component {
   }
 
   render() {
+    this.loadData()
     if ((this.state.messages).length !== 0) {
       return (
       <View style={{bottom: this.state.btnLocation,
@@ -105,7 +108,6 @@ export default class MessageList extends Component {
               ref={'textInput'}
               style={styles.input}
               onChangeText={text => this.setState({newMessage: text})}
-              // value={this.state.newMessage}
               placeholder="Type here ..."
             />
          <TouchableOpacity
@@ -124,9 +126,8 @@ export default class MessageList extends Component {
                 console.log('done?')
                 console.log(options)
               }
+              this.loadData()
               this.clearText('textInput')
-              this.setState({refresh: true});
-              console.log(this.state.messages)
           }}
           underlayColor='#D97573'>
           <Text style={styles.buttonText}>Send</Text>
